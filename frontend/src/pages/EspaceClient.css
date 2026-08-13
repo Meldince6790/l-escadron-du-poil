@@ -1,0 +1,24 @@
+.espace-client__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
+  margin: 2.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.espace-client__list li {
+  padding: 1.4rem 1.35rem 1.5rem;
+  border-radius: var(--radius-image);
+  background: var(--color-bg-secondary);
+}
+
+.espace-client__list h2 {
+  margin: 0 0 0.55rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.espace-client__list p {
+  color: var(--color-text-secondary);
+}
