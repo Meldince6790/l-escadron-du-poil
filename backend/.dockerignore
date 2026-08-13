@@ -5,3 +5,7 @@ node_modules
 *.md
 .DS_Store
 Thumbs.db
+*.pem
+*.crt
+*.key
+certs
