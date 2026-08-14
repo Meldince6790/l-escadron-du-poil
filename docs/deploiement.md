@@ -4,9 +4,9 @@
 **Application :** vitrine et prise de rendez-vous pour un service de toilettage canin et félin itinérant  
 **Dépôt GitHub :** [https://github.com/Meldince6790/l-escadron-du-poil](https://github.com/Meldince6790/l-escadron-du-poil)
 
-Ce document décrit le déploiement réel de l'application, tel qu'il est mis en œuvre dans le dépôt et sur les plateformes d'hébergement utilisées. Il sert également de support à la compétence C8 : *Documenter le déploiement d'une application dynamique web ou web mobile*.
+Ce document décrit le déploiement réel de l'application, tel qu'il est mis en œuvre dans le dépôt et sur les plateformes d'hébergement utilisées. Il sert également de support à la compétence C8 : _Documenter le déploiement d'une application dynamique web ou web mobile_.
 
-Le frontend (Vercel), le backend (Render) et la base MySQL (Aiven) ont été déployés afin de réaliser, tester et documenter la mise en production. Ces services n'ont pas vocation à rester nécessairement actifs après validation du projet. Les plateformes ont généré des URL HTTPS publiques lors du déploiement ; elles ne sont pas consignées ici. Les captures d'écran des sections 7, 9 et 10 conservent la preuve du déploiement et des tests réalisés.
+Le frontend (Vercel), le backend (Render) et la base MySQL (Aiven) ont été déployés afin de réaliser, tester et documenter la mise en production. Les plateformes ont généré des URL HTTPS publiques temporaires ; elles ne sont pas consignées ici et peuvent ne plus être accessibles après la période de démonstration. Les captures d'écran des sections 7, 9 et 10 conservent la preuve du déploiement et des tests réalisés. L'arrêt volontaire de ces services est décrit en fin de document.
 
 ---
 
@@ -48,11 +48,11 @@ Navigateur
 
 Frontend ↔ Backend : aucune communication implémentée à ce stade.
 
-| Composant | Technologie | Hébergement production | Rôle actuel |
-|---|---|---|---|
-| Frontend | React, Vite, JavaScript, React Router | Vercel | Interface (Accueil, Galerie, Agenda, Espace client) |
-| Backend | Node.js, Express 5, CommonJS, mysql2 | Render | API minimale (`GET /`) et vérification de connexion MySQL |
-| Base de données | MySQL 8 | Aiven (offre gratuite disponible lors du déploiement) ; service Docker `mysql:8.4` en local | Stockage ; aucune table métier n'est créée à ce stade |
+| Composant       | Technologie                           | Hébergement production                                                                      | Rôle actuel                                               |
+| --------------- | ------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Frontend        | React, Vite, JavaScript, React Router | Vercel                                                                                      | Interface (Accueil, Galerie, Agenda, Espace client)       |
+| Backend         | Node.js, Express 5, CommonJS, mysql2  | Render                                                                                      | API minimale (`GET /`) et vérification de connexion MySQL |
+| Base de données | MySQL 8                               | Aiven (offre gratuite disponible lors du déploiement) ; service Docker `mysql:8.4` en local | Stockage ; aucune table métier n'est créée à ce stade     |
 
 **État d'intégration :** le frontend et le backend sont déployés indépendamment. Le code frontend ne contient aucun appel HTTP vers l'API. La connexion Render → Aiven est en revanche validée.
 
@@ -89,26 +89,26 @@ Les trois services locaux partagent le réseau Compose. Cela ne signifie pas qu'
 
 ### Fichiers du dépôt utiles au déploiement
 
-| Fichier | Rôle |
-|---|---|
-| `docker-compose.yml` | Orchestration locale (frontend, backend, mysql) |
-| `.env.example` | Modèle des variables d'environnement, sans secret |
-| `.env` | Valeurs locales (ignoré par Git, à créer à partir de `.env.example`) |
-| `frontend/Dockerfile` | Image de développement Vite |
-| `backend/Dockerfile` | Image de développement Express |
-| `frontend/vercel.json` | Rewrite SPA pour Vercel |
-| `backend/src/config/database.js` | Pool MySQL et TLS optionnel |
-| `backend/src/app.js` | Serveur Express et vérification MySQL au démarrage |
+| Fichier                          | Rôle                                                                 |
+| -------------------------------- | -------------------------------------------------------------------- |
+| `docker-compose.yml`             | Orchestration locale (frontend, backend, mysql)                      |
+| `.env.example`                   | Modèle des variables d'environnement, sans secret                    |
+| `.env`                           | Valeurs locales (ignoré par Git, à créer à partir de `.env.example`) |
+| `frontend/Dockerfile`            | Image de développement Vite                                          |
+| `backend/Dockerfile`             | Image de développement Express                                       |
+| `frontend/vercel.json`           | Rewrite SPA pour Vercel                                              |
+| `backend/src/config/database.js` | Pool MySQL et TLS optionnel                                          |
+| `backend/src/app.js`             | Serveur Express et vérification MySQL au démarrage                   |
 
 ---
 
 ## 4. Organisation Git et branche de production
 
-| Élément | Valeur |
-|---|---|
-| Dépôt distant | `https://github.com/Meldince6790/l-escadron-du-poil.git` |
-| Branche de production | `main` |
-| Branche d'intégration | `develop` |
+| Élément               | Valeur                                                   |
+| --------------------- | -------------------------------------------------------- |
+| Dépôt distant         | `https://github.com/Meldince6790/l-escadron-du-poil.git` |
+| Branche de production | `main`                                                   |
+| Branche d'intégration | `develop`                                                |
 
 Le frontend Vercel et le backend Render sont configurés pour se déployer depuis **`main`**.
 
@@ -122,15 +122,15 @@ Le workflow Git est géré manuellement. Les secrets (fichier `.env`, certificat
 
 Ces variables sont lues par `backend/src/config/database.js` et `backend/src/app.js`.
 
-| Variable | Rôle | Exemple de placeholder |
-|---|---|---|
-| `PORT` | Port d'écoute HTTP | fourni automatiquement par Render |
-| `DB_HOST` | Hôte MySQL | `<hôte Aiven>` |
-| `DB_PORT` | Port MySQL | `<port Aiven>` |
-| `DB_USER` | Utilisateur MySQL | `<utilisateur Aiven>` |
-| `DB_PASSWORD` | Mot de passe MySQL | `<mot de passe Aiven>` |
-| `DB_NAME` | Nom de la base | `<nom de la base Aiven>` |
-| `DB_CA_PATH` | Chemin du certificat CA (Secret File Render) | `<chemin du Secret File>` |
+| Variable      | Rôle                                         | Exemple de placeholder            |
+| ------------- | -------------------------------------------- | --------------------------------- |
+| `PORT`        | Port d'écoute HTTP                           | fourni automatiquement par Render |
+| `DB_HOST`     | Hôte MySQL                                   | `<hôte Aiven>`                    |
+| `DB_PORT`     | Port MySQL                                   | `<port Aiven>`                    |
+| `DB_USER`     | Utilisateur MySQL                            | `<utilisateur Aiven>`             |
+| `DB_PASSWORD` | Mot de passe MySQL                           | `<mot de passe Aiven>`            |
+| `DB_NAME`     | Nom de la base                               | `<nom de la base Aiven>`          |
+| `DB_CA_PATH`  | Chemin du certificat CA (Secret File Render) | `<chemin du Secret File>`         |
 
 `DB_PORT` vaut `3306` par défaut dans le code si la variable est absente. En production Aiven, le port réel doit être renseigné.
 
@@ -140,14 +140,14 @@ Lorsque `DB_CA_PATH` est défini, le backend active TLS (`rejectUnauthorized: tr
 
 Le fichier `.env` (non versionné) alimente le service MySQL Docker. Le backend reçoit ensuite ces valeurs via `docker-compose.yml` :
 
-| Variable Compose (fichier `.env`) | Variable injectée au backend |
-|---|---|
-| `MYSQL_DATABASE` | `DB_NAME` |
-| `MYSQL_USER` | `DB_USER` |
-| `MYSQL_PASSWORD` | `DB_PASSWORD` |
-| — | `DB_HOST=mysql` (nom du service Docker) |
-| — | `DB_PORT=3306` |
-| — | `PORT=3000` |
+| Variable Compose (fichier `.env`) | Variable injectée au backend            |
+| --------------------------------- | --------------------------------------- |
+| `MYSQL_DATABASE`                  | `DB_NAME`                               |
+| `MYSQL_USER`                      | `DB_USER`                               |
+| `MYSQL_PASSWORD`                  | `DB_PASSWORD`                           |
+| —                                 | `DB_HOST=mysql` (nom du service Docker) |
+| —                                 | `DB_PORT=3306`                          |
+| —                                 | `PORT=3000`                             |
 
 `MYSQL_ROOT_PASSWORD` sert uniquement au service MySQL Docker (healthcheck et initialisation). Il n'est pas passé au backend.
 
@@ -180,11 +180,11 @@ docker compose ps
 
 Services attendus :
 
-| Service | Image | Port hôte |
-|---|---|---|
-| `frontend` | build local (`node:22-bookworm-slim`) | 5173 |
-| `backend` | build local (`node:22-bookworm-slim`) | 3000 |
-| `mysql` | `mysql:8.4` | 3306 |
+| Service    | Image                                 | Port hôte |
+| ---------- | ------------------------------------- | --------- |
+| `frontend` | build local (`node:22-bookworm-slim`) | 5173      |
+| `backend`  | build local (`node:22-bookworm-slim`) | 3000      |
+| `mysql`    | `mysql:8.4`                           | 3306      |
 
 Caractéristiques réelles du compose :
 
@@ -213,7 +213,7 @@ curl http://localhost:3000/
 Réponse attendue :
 
 ```json
-{"message":"API opérationnelle"}
+{ "message": "API opérationnelle" }
 ```
 
 Journaux backend attendus :
@@ -234,13 +234,13 @@ docker compose logs mysql
 
 Configuration confirmée :
 
-| Paramètre | Valeur |
-|---|---|
-| Plateforme | Vercel |
-| Root Directory | `frontend` |
-| Framework Preset | Vite |
-| Branche | `main` |
-| HTTPS | fourni par Vercel |
+| Paramètre        | Valeur            |
+| ---------------- | ----------------- |
+| Plateforme       | Vercel            |
+| Root Directory   | `frontend`        |
+| Framework Preset | Vite              |
+| Branche          | `main`            |
+| HTTPS            | fourni par Vercel |
 
 Le build de production correspond au script du `frontend/package.json` :
 
@@ -250,15 +250,15 @@ npm run build
 
 soit `vite build`.
 
-Lors du déploiement, Vercel a généré une URL HTTPS publique. Cette URL n'est pas consignée dans le dépôt : le service peut être désactivé après validation du projet. Les captures ci-dessous conservent la preuve du déploiement.
+Lors du déploiement, Vercel a généré une URL HTTPS publique temporaire. Cette URL n'est pas consignée dans le dépôt et peut ne plus être accessible. Les captures ci-dessous conservent la preuve du déploiement.
 
 ![Déploiement Vercel au statut Ready / Production](captures/vercel-deploiement.png)
 
-*Figure 1 — Tableau de bord Vercel : déploiement du frontend abouti au statut Ready / Production, depuis la branche `main`.*
+_Figure 1 — Tableau de bord Vercel : déploiement du frontend abouti au statut Ready / Production, depuis la branche `main`._
 
 ![Frontend accessible publiquement](captures/vercel-frontend.png)
 
-*Figure 2 — Application frontend servie en HTTPS : page d'accueil accessible publiquement après déploiement.*
+_Figure 2 — Application frontend servie en HTTPS : page d'accueil accessible publiquement après déploiement._
 
 ---
 
@@ -296,19 +296,19 @@ Voir aussi la section 14 (incident Vercel).
 
 Configuration confirmée :
 
-| Paramètre | Valeur |
-|---|---|
-| Plateforme | Render |
-| Root Directory | `backend` |
-| Branche | `main` |
-| Build Command | `npm ci` |
-| Start Command | `npm start` |
-| Port | `process.env.PORT` (fourni par Render) |
-| HTTPS | fourni sur l'URL publique Render |
+| Paramètre      | Valeur                                 |
+| -------------- | -------------------------------------- |
+| Plateforme     | Render                                 |
+| Root Directory | `backend`                              |
+| Branche        | `main`                                 |
+| Build Command  | `npm ci`                               |
+| Start Command  | `npm start`                            |
+| Port           | `process.env.PORT` (fourni par Render) |
+| HTTPS          | fourni sur l'URL publique Render       |
 
 `npm start` exécute `node src/app.js` (`backend/package.json`).
 
-Lors du déploiement, Render a généré une URL HTTPS publique. Cette URL n'est pas consignée dans le dépôt : le service peut être désactivé après validation du projet. Les captures ci-dessous conservent la preuve du déploiement et des tests.
+Lors du déploiement, Render a généré une URL HTTPS publique temporaire. Cette URL n'est pas consignée dans le dépôt et peut ne plus être accessible. Les captures ci-dessous conservent la preuve du déploiement et des tests.
 
 Variables d'environnement à déclarer dans le tableau de bord Render : voir section 5.1. Ne jamais coller les valeurs réelles dans ce document.
 
@@ -320,22 +320,22 @@ curl <URL Render>/
 
 ![Logs Render — connexion MySQL](captures/render-logs.png)
 
-*Figure 3 — Journaux Render du backend : message `Connexion MySQL opérationnelle`, sans identifiant ni mot de passe.*
+_Figure 3 — Journaux Render du backend : message `Connexion MySQL opérationnelle`, sans identifiant ni mot de passe._
 
 ![API Render — GET /](captures/render-api.png)
 
-*Figure 4 — URL publique de l'API Render : la route `GET /` répond `{"message":"API opérationnelle"}`.*
+_Figure 4 — URL publique de l'API Render : la route `GET /` répond `{"message":"API opérationnelle"}`._
 
 ---
 
 ## 10. Configuration de la base MySQL sur Aiven
 
-| Paramètre | Valeur |
-|---|---|
-| Fournisseur | Aiven |
-| Offre | offre gratuite disponible lors du déploiement (période d'essai également affichée dans l'interface ; conditions non garanties dans la durée) |
-| Moteur | MySQL |
-| Usage | connexion distante depuis Render |
+| Paramètre   | Valeur                                                                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fournisseur | Aiven                                                                                                                                        |
+| Offre       | offre gratuite disponible lors du déploiement (période d'essai également affichée dans l'interface ; conditions non garanties dans la durée) |
+| Moteur      | MySQL                                                                                                                                        |
+| Usage       | connexion distante depuis Render                                                                                                             |
 
 Le nom de base attendu par le projet est celui configuré dans `DB_NAME` sur Render. Il doit correspondre **exactement** au nom réel de la base Aiven (voir incident section 14).
 
@@ -343,11 +343,11 @@ Aucune table métier n'est créée par le code actuel. Le backend exécute uniqu
 
 Identifiant, hôte, port et mot de passe : à récupérer dans la console Aiven et à reporter uniquement dans Render, jamais dans Git.
 
-Le service Aiven peut être arrêté après validation. La capture ci-dessous conserve la preuve de son état au moment des tests.
+Le service Aiven a été volontairement retiré après validation. La capture ci-dessous conserve la preuve de son état au moment des tests.
 
 ![Service MySQL Aiven Running](captures/aiven-mysql.png)
 
-*Figure 5 — Console Aiven : service MySQL au statut Running, informations de connexion repliées.*
+_Figure 5 — Console Aiven : service MySQL au statut Running, informations de connexion repliées._
 
 ---
 
@@ -392,7 +392,7 @@ Ordre recommandé, cohérent avec les dépendances réelles (la base avant l'API
 7. Déployer le frontend et contrôler le statut Ready / Production.
 8. Vérifier l'accueil public et le rechargement direct d'une route SPA (`/agenda`).
 
-Les services d'hébergement peuvent ensuite être désactivés. Les captures d'écran documentent le résultat obtenu.
+Les services d'hébergement de démonstration ont ensuite été volontairement retirés. Les captures d'écran documentent le résultat obtenu.
 
 ---
 
@@ -410,7 +410,7 @@ Les services d'hébergement peuvent ensuite être désactivés. Les captures d'�
 - `GET /` répond HTTP 200 avec :
 
 ```json
-{"message":"API opérationnelle"}
+{ "message": "API opérationnelle" }
 ```
 
 ### Base de données (Aiven)
@@ -545,31 +545,45 @@ docker compose logs mysql
 
 ---
 
+## Arrêt volontaire des services de démonstration
+
+Les déploiements Vercel (frontend), Render (backend) et Aiven (MySQL) ont été réalisés uniquement pour tester et documenter la mise en production.
+
+Ces trois services ont été validés avant leur suppression : le frontend était accessible en HTTPS, le backend répondait `{"message":"API opérationnelle"}` avec une connexion MySQL opérationnelle, et le service Aiven était Running. Les fichiers du dossier `docs/captures/` constituent les preuves de ce déploiement.
+
+Le dépôt GitHub et la présente documentation sont conservés. Ils permettent de reproduire ultérieurement le déploiement à partir du code, de `docker-compose.yml`, de `frontend/vercel.json` et de la configuration backend (variables d'environnement, TLS, Secret File).
+
+L'application utilise le nom d'une entreprise existante avec l'autorisation de sa dirigeante. Elle n'est pas le site officiel de cette entreprise et n'a pas vocation à rester publiquement accessible ni à être présentée comme tel. Les services publics de démonstration ont donc été volontairement retirés après validation.
+
+Les URL HTTPS générées par Vercel et Render étaient temporaires. Elles peuvent ne plus être accessibles.
+
+---
+
 ## Annexes
 
 ### Scripts npm réellement définis
 
 **Frontend (`frontend/package.json`)**
 
-| Script | Commande |
-|---|---|
-| `dev` | `vite` |
-| `build` | `vite build` |
-| `lint` | `oxlint` |
+| Script    | Commande       |
+| --------- | -------------- |
+| `dev`     | `vite`         |
+| `build`   | `vite build`   |
+| `lint`    | `oxlint`       |
 | `preview` | `vite preview` |
 
 **Backend (`backend/package.json`)**
 
-| Script | Commande |
-|---|---|
-| `start` | `node src/app.js` |
-| `dev` | `node --watch src/app.js` |
+| Script  | Commande                  |
+| ------- | ------------------------- |
+| `start` | `node src/app.js`         |
+| `dev`   | `node --watch src/app.js` |
 
 ### Informations à compléter manuellement
 
-Les URL publiques Vercel et Render ne sont pas à renseigner dans ce document.
+Les URL publiques Vercel et Render ne sont pas à renseigner dans ce document : elles étaient temporaires et les services de démonstration ont été volontairement retirés.
 
-| Information | Remarque |
-|---|---|
-| Noms exacts du projet Vercel, du service Render et du service Aiven | Absents du dépôt ; utiles uniquement en annexe orale ou dans les captures, sans identifiants |
-| Fichiers du dossier `docs/captures/` | Référencés ci-dessus ; à déposer sous les noms `vercel-deploiement.png`, `vercel-frontend.png`, `render-logs.png`, `render-api.png`, `aiven-mysql.png` |
+| Information                                                         | Remarque                                                                        |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Noms exacts du projet Vercel, du service Render et du service Aiven | Absents du dépôt ; visibles le cas échéant dans les captures, sans identifiants |
+| Fichiers du dossier `docs/captures/`                                | Présents et référencés aux figures 1 à 5 ; preuves du déploiement validé        |
